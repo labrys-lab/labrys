@@ -1,0 +1,17 @@
+{$LAB_DOMAIN} {
+
+    # FastAPI backend (service added in Phase 2)
+    handle /api/* {
+        reverse_proxy api:8000
+    }
+
+    # OpenSearch Dashboards
+    handle /dashboards* {
+        reverse_proxy opensearch-dashboards:5601
+    }
+
+    # Next.js frontend (service added in Phase 2)
+    handle {
+        reverse_proxy ui:3000
+    }
+}

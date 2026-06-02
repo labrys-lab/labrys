@@ -1,0 +1,147 @@
+name: soc-lab
+
+networks:
+  lab-network:
+    driver: bridge
+    internal: true
+  soc-network:
+    driver: bridge
+    internal: true
+  management-network:
+    driver: bridge
+
+volumes:
+  opensearch-data:
+  wazuh-manager-data:
+  wazuh-logs:
+  samba-data:
+
+services:
+
+  # ── OpenSearch ─────────────────────────────────────────────────────────────
+  opensearch:
+    image: opensearchproject/opensearch:2.19.5
+    environment:
+      - discovery.type=single-node
+      - OPENSEARCH_JAVA_OPTS=-Xms${OPENSEARCH_HEAP} -Xmx${OPENSEARCH_HEAP}
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=${OPENSEARCH_INITIAL_ADMIN_PASSWORD}
+      - bootstrap.memory_lock=true
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - opensearch-data:/usr/share/opensearch/data
+    networks:
+      - soc-network
+    cap_drop:
+      - ALL
+    cap_add:
+      - IPC_LOCK
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -k https://localhost:9200/_cluster/health -u admin:$$OPENSEARCH_INITIAL_ADMIN_PASSWORD | grep -q '\"status\"'"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+    restart: unless-stopped
+
+  # ── OpenSearch Dashboards ──────────────────────────────────────────────────
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:2.19.5
+    environment:
+      - OPENSEARCH_HOSTS=https://opensearch:9200
+      - OPENSEARCH_USERNAME=admin
+      - OPENSEARCH_PASSWORD=${OPENSEARCH_INITIAL_ADMIN_PASSWORD}
+    networks:
+      - soc-network
+      - management-network
+    cap_drop:
+      - ALL
+    depends_on:
+      opensearch:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ── Wazuh Manager ─────────────────────────────────────────────────────────
+  # Attached to both soc-network and lab-network — bridges log flow from agents to OpenSearch.
+  wazuh-manager:
+    image: wazuh/wazuh-manager:4.14.5
+    environment:
+      - INDEXER_URL=https://opensearch:9200
+      - INDEXER_USERNAME=admin
+      - INDEXER_PASSWORD=${OPENSEARCH_INITIAL_ADMIN_PASSWORD}
+      - FILEBEAT_SSL_VERIFICATION_MODE=none
+      - WAZUH_API_USERNAME=${WAZUH_API_USERNAME}
+      - WAZUH_API_PASSWORD=${WAZUH_API_PASSWORD}
+    volumes:
+      - wazuh-manager-data:/var/ossec/data
+      - ./wazuh/rules:/var/ossec/etc/rules:ro
+      - wazuh-logs:/var/ossec/logs
+    networks:
+      - soc-network
+      - lab-network
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - FOWNER
+      - SETUID
+      - SETGID
+      - NET_BIND_SERVICE
+      - SYS_PTRACE
+    depends_on:
+      opensearch:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ── Samba Active Directory ─────────────────────────────────────────────────
+  samba-ad:
+    image: diegogslomp/samba-ad-dc:4.24.3
+    environment:
+      - DOMAIN=${SAMBA_DOMAIN}
+      - DOMAINPASS=${SAMBA_ADMIN_PASSWORD}
+      - REALM=${SAMBA_REALM}
+      - DNSFORWARDER=${SAMBA_DNS_FORWARDER}
+    volumes:
+      - samba-data:/var/lib/samba
+    networks:
+      - lab-network
+    cap_drop:
+      - ALL
+    cap_add:
+      - SYS_ADMIN
+      - NET_ADMIN
+      - SETUID
+      - SETGID
+      - CHOWN
+      - DAC_OVERRIDE
+    healthcheck:
+      test: ["CMD-SHELL", "samba-tool domain info 127.0.0.1 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 15
+      start_period: 90s
+    restart: unless-stopped
+
+  # ── Caddy ─────────────────────────────────────────────────────────────────
+  caddy:
+    image: caddy:2
+    environment:
+      - LAB_DOMAIN=${LAB_DOMAIN}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+    networks:
+      - management-network
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+    restart: unless-stopped
