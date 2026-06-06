@@ -128,6 +128,19 @@ services:
       start_period: 90s
     restart: unless-stopped
 
+  # ── Next.js UI ─────────────────────────────────────────────────────────────
+  ui:
+    build:
+      context: ./ui
+      dockerfile: Dockerfile
+    environment:
+      - NEXT_PUBLIC_LAB_DOMAIN=${LAB_DOMAIN}
+    networks:
+      - management-network
+    cap_drop:
+      - ALL
+    restart: unless-stopped
+
   # ── Caddy ─────────────────────────────────────────────────────────────────
   caddy:
     image: caddy:2
