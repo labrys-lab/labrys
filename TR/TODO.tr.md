@@ -47,22 +47,23 @@
 ## Kişi 2
 
 ### Uygulama
-- [ ] FastAPI senaryo motoru
-  - [ ] `POST /scenario/{name}/start`
-  - [ ] `POST /scenario/{name}/stop`
-  - [ ] `POST /scenario/{name}/reset`
-  - [ ] Başarı tespiti için Wazuh API dinleme
-  - [ ] Senaryo adı için izin listesi doğrulaması
-  - [ ] Tüm aksiyon endpoint'lerinde rate limiting
+- [x] FastAPI senaryo motoru
+  - [x] `POST /scenario/{name}/start`
+  - [x] `POST /scenario/{name}/stop`
+  - [x] `POST /scenario/{name}/reset`
+  - [x] `GET /scenario/{name}/status`
+  - [x] Başarı tespiti için Wazuh API dinleme
+  - [x] Senaryo adı için izin listesi doğrulaması
+  - [x] Tüm aksiyon endpoint'lerinde rate limiting
 
-- [ ] Next.js web arayüzü
-  - [ ] Senaryo kartları (ad, zorluk seviyesi, tahmini süre, açıklama)
-  - [ ] Lab durumu (başlıyor, hazır, çalışıyor)
-  - [ ] Bağlantı bilgileri (Kali terminal erişimi, Wazuh Dashboard linki)
-  - [ ] Adım adım saldırı rehberi paneli
-  - [ ] Alert özet akışı
-  - [ ] Başarı durumu gösterimi
-  - [ ] Lab sıfırlama butonu
+- [x] Next.js web arayüzü
+  - [x] Senaryo kartları (ad, zorluk seviyesi, tahmini süre, açıklama)
+  - [x] Lab durumu (boşta, başlıyor, hazır, çalışıyor, başarılı)
+  - [x] Bağlantı bilgileri (Kali terminal erişimi, Wazuh Dashboard linki)
+  - [x] Adım adım saldırı rehberi paneli
+  - [x] Alert özet akışı
+  - [x] Başarı durumu gösterimi
+  - [x] Lab sıfırlama butonu
 
 - [ ] Kali Linux container kurulumu (hazır araçlar: Impacket, Hashcat, Nmap, SQLmap, CrackMapExec)
 - [ ] Ubuntu Target container kurulumu (Wazuh agent entrypoint scripti)

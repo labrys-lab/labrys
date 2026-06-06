@@ -47,22 +47,23 @@
 ## Person 2
 
 ### Application
-- [ ] FastAPI scenario engine
-  - [ ] `POST /scenario/{name}/start`
-  - [ ] `POST /scenario/{name}/stop`
-  - [ ] `POST /scenario/{name}/reset`
-  - [ ] Wazuh API polling for success detection
-  - [ ] Scenario name allowlist validation
-  - [ ] Rate limiting on all action endpoints
+- [x] FastAPI scenario engine
+  - [x] `POST /scenario/{name}/start`
+  - [x] `POST /scenario/{name}/stop`
+  - [x] `POST /scenario/{name}/reset`
+  - [x] `GET /scenario/{name}/status`
+  - [x] Wazuh API polling for success detection
+  - [x] Scenario name allowlist validation
+  - [x] Rate limiting on all action endpoints
 
-- [ ] Next.js web interface
-  - [ ] Scenario cards (name, difficulty, estimated duration, description)
-  - [ ] Lab status (starting, ready, running)
-  - [ ] Connection details (Kali terminal access, Wazuh Dashboard link)
-  - [ ] Step-by-step attack guide panel
-  - [ ] Alert feed summary
-  - [ ] Success state display
-  - [ ] Lab reset button
+- [x] Next.js web interface
+  - [x] Scenario cards (name, difficulty, estimated duration, description)
+  - [x] Lab status (idle, starting, ready, running, success)
+  - [x] Connection details (Kali terminal access, Wazuh Dashboard link)
+  - [x] Step-by-step attack guide panel
+  - [x] Alert feed summary
+  - [x] Success state display
+  - [x] Lab reset button
 
 - [ ] Kali Linux container setup (pre-installed tools: Impacket, Hashcat, Nmap, SQLmap, CrackMapExec)
 - [ ] Ubuntu Target container setup (Wazuh agent entrypoint script)

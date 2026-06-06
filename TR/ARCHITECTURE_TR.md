@@ -136,17 +136,27 @@ scenarios/[senaryo-adi]/
 - Sadece lab-network'e erişimi var, internete çıkamaz
 
 ### FastAPI
-- Senaryo başlatma, durdurma, sıfırlama endpoint'leri
-- Wazuh API'sini polling ile dinler
-- Docker SDK kullanarak container'ları yönetir
+- Versiyon: Python 3.12, `api/` dizininde
+- Endpoint'ler: POST /start, POST /stop, POST /reset, GET /status (senaryo başına)
+- Senaryo adı Docker operasyonundan önce izin listesiyle (6 senaryo) doğrulanır
+- Rate limiting: tüm aksiyon endpoint'lerinde IP başına 5 istek/dakika (slowapi)
+- Wazuh API polling ile JWT token önbelleğe alma (840 saniyelik TTL)
+- Docker SDK kullanarak container yönetimi — subprocess yok
+- pydantic-settings ile konfigürasyon; eksik credentials varsa başlangıçta hata verir
+- Container dağıtımı için Dockerfile dahil
 
 ### Next.js
-- Senaryo kartları (zorluk seviyesi, tahmini süre, açıklama)
-- Lab durumu (başlıyor, hazır, çalışıyor)
-- Bağlantı bilgileri
-- Adım adım saldırı rehberi
-- Alert özeti
-- Lab sıfırlama butonu
+- Versiyon: 14, App Router, TypeScript, Tailwind CSS, `ui/` dizininde
+- 6 senaryo kartlı senaryo seçim sayfası (zorluk rozeti, etiketler, tahmini süre)
+- 3 saniyelik Wazuh durum polling'li senaryo sayfası
+- Lab durumu: boşta / başlıyor / hazır / çalışıyor / başarılı
+- Bağlantı bilgisi paneli: kopyalanabilir Kali terminal komutu, Wazuh Dashboard linki
+- API'den çekilen saldırı rehberi paneli (404-güvenli yedek mesajlı)
+- Alert akışı: maksimum 10 alert, Wazuh önem seviyesine göre renk kodlu
+- CSS giriş animasyonlu başarı banner'ı
+- İki adımlı onaylı sıfırlama butonu
+- Duyarlı iki sütunlu düzen (mobilde tek sütun)
+- Container dağıtımı için standalone çıktılı Dockerfile
 
 ### Caddy
 - Reverse proxy

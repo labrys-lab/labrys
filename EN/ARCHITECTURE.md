@@ -136,17 +136,27 @@ scenarios/[scenario-name]/
 - Network access restricted to `lab-network` only — no internet egress
 
 ### FastAPI
-- Endpoints: start, stop, reset per scenario
-- Polls Wazuh API for scenario-specific alert detection
-- Manages containers via Docker SDK (not subprocess)
+- Version: Python 3.12, located at `api/`
+- Endpoints: POST /start, POST /stop, POST /reset, GET /status per scenario
+- Scenario name validated against allowlist (6 scenarios) before any Docker operation
+- Rate limiting: 5 requests/minute per IP on all action endpoints (slowapi)
+- Wazuh API polling with JWT token caching (840-second TTL)
+- Container management via Docker SDK — no subprocess
+- pydantic-settings for configuration; startup fails fast if credentials are missing
+- Dockerfile included for container deployment
 
 ### Next.js
-- Scenario cards (difficulty, estimated duration, description)
-- Lab status (starting, ready, running)
-- Connection details (Kali terminal access, Wazuh Dashboard link)
-- Step-by-step attack guide
-- Alert feed summary
-- Lab reset button
+- Version: 14, App Router, TypeScript, Tailwind CSS, located at `ui/`
+- Scenario selection page with 6 scenario cards (difficulty badge, tags, estimated duration)
+- Per-scenario page with 3-second Wazuh status polling
+- Lab status: idle / starting / ready / running / success
+- Connection info panel: copyable Kali terminal command, Wazuh Dashboard link
+- Attack guide panel fetched from API (404-safe fallback message)
+- Alert feed: max 10 alerts, color-coded by Wazuh severity level
+- Success banner with CSS entrance animation
+- Reset button with inline two-step confirmation
+- Two-column responsive layout (single column on mobile)
+- Dockerfile with standalone output for container deployment
 
 ### Caddy
 - Reverse proxy for Next.js and FastAPI under a single domain
